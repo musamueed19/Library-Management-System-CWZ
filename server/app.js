@@ -4,6 +4,8 @@
 // If we want to use 'import' keyword, then mention the "type" in the package.json
 import express from "express";
 import { config } from "dotenv";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 
 export const app = express();
 
@@ -13,5 +15,17 @@ config({ path: "./config/config.env" });
 
 // Whenever, we want to use middleware, we can use "app.use()" function, like "express.json()" is a middleware
 
+// earlier we use "bodyparser" named package, normally, the below middleware is used to ease communication between frontend and backend
+// because, the http communication is normally in the, JSON format.
+// We are using builtin middleware to ease JSON communication, we can ignore this, if we are using third-party packages for this functionality
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  cors({
+    origin: [process.env.FRONTEND_URL],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+app.use(cookieParser());
