@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "A CWZ - Library Management System",
   "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
   "dependencies": {
     "abbrev": "^1.1.1",
     "accepts": "^1.3.8",
@@ -146,9 +152,6 @@
     "wide-align": "^1.1.5",
     "wrappy": "^1.0.2",
     "yallist": "^4.0.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Muhammad Musa Mueed",
   "license": "MIT"
