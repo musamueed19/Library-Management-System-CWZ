@@ -6,7 +6,12 @@ import express from "express";
 import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+
+// database setup
 import { connectDB } from "./database/db.js";
+
+// errorMiddleware setup
+import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 
 export const app = express();
 
@@ -32,4 +37,10 @@ app.use(
 );
 app.use(cookieParser());
 
+
+// database function
 connectDB();
+
+
+// use errorMiddleware at the last
+app.use(errorMiddleware);
