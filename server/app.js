@@ -6,10 +6,12 @@ import express from "express";
 import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { connectDB } from "./database/db.js";
 
 export const app = express();
 
 config({ path: "./config/config.env" });
+config({path: './.env'})
 
 // Whenver  we want to use the environment variables, we can use the process.env
 
@@ -29,3 +31,5 @@ app.use(
   })
 );
 app.use(cookieParser());
+
+connectDB();
