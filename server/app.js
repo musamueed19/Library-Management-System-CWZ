@@ -44,3 +44,5 @@ connectDB();
 
 // use errorMiddleware at the last
 app.use(errorMiddleware);
+// This errorMiddleware  will catch all the errors, which are not caught by other middleware, and will return the error to the user
+
