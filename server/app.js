@@ -13,6 +13,10 @@ import { connectDB } from "./database/db.js";
 // errorMiddleware setup
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 
+
+// defining routers, authRouter
+import authRouter from "./routes/authRouter.js";
+
 export const app = express();
 
 config({ path: "./config/config.env" });
@@ -37,6 +41,9 @@ app.use(
 );
 app.use(cookieParser());
 
+// middleware to attach "base path"
+// http://localhost:port + /api/v1/auth
+app.use("/api/v1/auth", authRouter);
 
 // database function
 connectDB();

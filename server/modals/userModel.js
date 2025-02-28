@@ -57,10 +57,10 @@ const userSchema = new mongoose.Schema(
 );
 
 // create a method
-userSchema.method.generateVerificationCode = function () {
+userSchema.methods.generateVerificationCode = function () {
   function generateRandomSixDigitNumber() {
     const firstDigit = Math.floor(Math.random() * 9) + 1;
-    const remainingDigits = Math.floor(Math.random() * 99999)
+    const remainingDigits = Math.floor(Math.random() * 10000)
       .toString()
       .padStart(5, 0);
 

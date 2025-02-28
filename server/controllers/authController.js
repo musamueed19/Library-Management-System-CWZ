@@ -7,13 +7,12 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 // managing users for authentication
 import { User } from "../modals/userModel.js";
 
-// for user password hashing
+// for user password & hashing
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
-
 // sending verification code
-import {generateVerificationCode} from "../utils/sendVerificationCode.js"
+import { sendVerificationCode } from "../utils/sendVerificationCode.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
   try {
@@ -29,7 +28,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       email,
       accountVerified: false,
     });
-    if (registrationAttemptsByUser.length >= 5) {
+    if (registrationAttemptsByUser.length >= 10) {
       return next(
         new ErrorHandler(
           "You have exceeded the number of registration attempts. Please contact support.",
@@ -52,6 +51,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       password: hashedPassword,
     });
     const verificationCode = await user.generateVerificationCode();
+    // console.log(verificationCode)
     await user.save();
     sendVerificationCode(verificationCode, email, res);
   } catch (error) {

@@ -15,7 +15,7 @@ export async function connectDB() {
 
   try {
     await moongose.connect(process.env.MONGO_URI, {
-      dbName: "MERN STACK LIBRARY MANAGEMENT SYSTEM - CWZ",
+      dbName: "Learning_Management_System_CWZ",
     });
     console.log("Database connected successfully...");
   } catch (err) {
