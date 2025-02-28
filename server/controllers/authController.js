@@ -1,8 +1,19 @@
+// custom build ErrorHandler Class extends Error class - for custom error handling (Middleware)
 import ErrorHandler from "../middlewares/errorMiddleware.js";
+
+// wrapper function for "custom defined Error Handling" using (Middleware).
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
+
+// managing users for authentication
 import { User } from "../modals/userModel.js";
+
+// for user password hashing
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+
+
+// sending verification code
+import {generateVerificationCode} from "../utils/sendVerificationCode.js"
 
 export const register = catchAsyncErrors(async (req, res, next) => {
   try {
