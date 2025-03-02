@@ -13,6 +13,9 @@ import crypto from "crypto";
 
 // sending verification code
 import { sendVerificationCode } from "../utils/sendVerificationCode.js";
+
+
+// sending token - after OTP Validation and User Verification
 import { sendToken } from "../utils/sendToken.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
@@ -81,8 +84,21 @@ export const verifyOTP = catchAsyncErrors(async (req, res, next) => {
 
   const { email, otp } = req.body;
 
-  if (!email || !otp) {
-    return next(new ErrorHandler("Email or otp is missing.", 400));
+  // if both are missing
+  if (!email && !otp) {
+    return next(new ErrorHandler("Email and otp are missing.", 400));
+    // Bad Request - 400
+  }
+
+// if emai is missing
+  if (!email) {
+    return next(new ErrorHandler("Email is missing.", 400));
+    // Bad Request - 400
+  }
+
+  // if otp is missing
+  if (!otp) {
+    return next(new ErrorHandler("Otp is missing.", 400));
     // Bad Request - 400
   }
 
