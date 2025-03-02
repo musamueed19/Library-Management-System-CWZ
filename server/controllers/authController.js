@@ -13,6 +13,7 @@ import crypto from "crypto";
 
 // sending verification code
 import { sendVerificationCode } from "../utils/sendVerificationCode.js";
+import { sendToken } from "../utils/sendToken.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
   try {
@@ -55,7 +56,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     await user.save();
     sendVerificationCode(verificationCode, email, res);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
@@ -74,3 +75,86 @@ export const register = catchAsyncErrors(async (req, res, next) => {
 // to. So basically, catchAsyncErrors is a function that accepts a function as an argument.
 
 // This function is the one that is being wrapped by catchAsyncErrors. So if there is an error in this function, catchAsyncErrors will catch it and send a response back to the client.
+
+export const verifyOTP = catchAsyncErrors(async (req, res, next) => {
+  // waht we need from frontend side, aur POST Request
+
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return next(new ErrorHandler("Email or otp is missing.", 400));
+    // Bad Request - 400
+  }
+
+  try {
+    //
+    const userAllEntries = await User.find({
+      email,
+      accountVerified: false,
+    }).sort({ createdAt: -1 }); //sort on the basis of User "Created at" Descending Order. (Latest user created comes first)
+
+    // if someone, has not try
+    if (!userAllEntries) {
+      return next(new ErrorHandler("User not found.", 404));
+      // Resource, or user could found by the server - 404
+    }
+
+    let user;
+
+    // whether code is expired or not, if user has tried many times.
+    // then delete all remaing users, except the latest one - stored in the "user" variable (object).
+    if (userAllEntries.length > 1) {
+      user = userAllEntries[0];
+
+      // how to tell DB to delete all such entries from the "User Modal"
+      await User.deleteMany({
+        // $ne stands for notEqual
+        // it means, if it is notEqual to the user obj's id, then delete- otherwise do not delete that single user.
+        _id: { $ne: user._id },
+
+        // the email of the user should be the same email, which for user is trying to verify OTP.
+        email,
+
+        // and those "User records or - objects from User Collection" will be deleted, those have accound Unverified
+        accountVerified: false,
+      });
+    } else {
+      user = userAllEntries[0];
+    }
+
+    // make sure, OTP is converted to Number - as DB USER Schema property, VerificationCode is (Number Type)
+    if (user.verificationCode !== +otp) {
+      return next(new ErrorHandler("Invalid OTP.", 400));
+      // Bad Request, as we say the Client, that we cannot move forward, it is incorrect - 400
+    }
+
+    // store current time
+    const currentTime = Date.now();
+
+    // Get User record, code expiry DateTime - get only time
+    const verificationCodeExpire = new Date(
+      user.verificationCodeExpire
+    ).getTime();
+
+    // Now, both have same format
+    if (currentTime > verificationCodeExpire) {
+      return next(new ErrorHandler("OTP expired.", 400));
+    }
+
+    // Now, checked that, user have correct OTP, and within expiry time. (Means OTP is fresh).
+
+    user.accountVerified = true;
+    user.verificationCode = null;
+    user.verificationCodeExpire = null;
+
+    // do validations on only those fields of the (user object in the User Collection) - of which fields we have modified, not on others, like password
+    await user.save({ validateModifiedOnly: true });
+
+    // Now, we need to send the token to the client,
+    sendToken(user, 200, "Account Verified.", res);
+
+    // catch, if any unconditional error occurs
+  } catch (error) {
+    return next(new ErrorHandler("Internal server error.", 500));
+  }
+});
