@@ -5,7 +5,7 @@ export function sendToken(user, statusCode, message, res) {
   
   
     // Generally, token is stoed in cookie. So, we will generate token first - then store in cookie, and send cookie with the "res" object
-  res.status(statusCode).cookie("token", sendToken, {
+  res.status(statusCode).cookie("token", token, {
     // we also need to give some options like - when it will expire
     expires: new Date(
       Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 100
